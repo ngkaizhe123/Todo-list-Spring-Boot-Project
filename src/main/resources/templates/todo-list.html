@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MY TODO LIST</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .completed {
+            text-decoration: line-through;
+            color: #6c757d;
+        }
+        .todo-item {
+            transition: all 0.3s ease;
+        }
+        .todo-item:hover {
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- title -->
+            <div class="text-center mb-4">
+                <h1 class="display-4 text-primary">📝 My Todo List</h1>
+                <p class="lead">Simple and easy-to-use task management tool</p>
+            </div>
+
+            <!-- create new task in list -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <form th:action="@{/todos}" th:object="${newTodo}" method="post">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <input type="text" th:field="*{title}" class="form-control"
+                                       placeholder="Please enter task Title..." required>
+                            </div>
+                            <div class="col-md-4">
+                                <input type="text" th:field="*{description}" class="form-control"
+                                       placeholder="Task description (optional) ">
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" class="btn btn-primary w-100">ADD</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Pending task list -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Task List</h5>
+                </div>
+                <!-- If task empty -->
+                <div class="card-body p-0">
+                    <div th:if="${todos.empty}" class="text-center p-4">
+                        <p class="text-muted">🎉 Good job! No pending task here, take a break! </p>
+                    </div>
+
+                    <div th:each="todo : ${todos}" class="todo-item border-bottom p-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <!-- button change to complete status -->
+                                <form th:action="@{/todos/{id}/toggle(id=${todo.id})}" method="post" class="me-3">
+                                    <button type="submit" class="btn btn-sm"
+                                            th:class="${todo.completed} ? 'btn-success' : 'btn-outline-secondary'">
+                                        <span th:text="${todo.completed} ? '✓' : '○'"></span>
+                                    </button>
+                                </form>
+
+                                <!-- task content -->
+                                <div th:classappend="${todo.completed} ? 'completed' : ''">
+                                    <h6 class="mb-1" th:text="${todo.title}">Task Title</h6>
+                                    <small class="text-muted" th:text="${todo.description} ?: 'No Description'">Description</small>
+                                    <br>
+                                    <small class="text-muted">
+                                        create in: <span th:text="${#temporals.format(todo.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
+                                    </small>
+                                </div>
+                            </div>
+
+                            <!-- delete task -->
+                            <form th:action="@{/todos/{id}/delete(id=${todo.id})}" method="post">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">DELETE</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary info -->
+            <div class="mt-3 text-center">
+                <small class="text-muted">
+                    Total <span th:text="${todos.size()}">0</span> task(s) |
+                    Completed <span th:text="${todos.?[completed == true].size()}">0</span> task(s)
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
