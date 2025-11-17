@@ -20,6 +20,16 @@ public class TodoController {
     @GetMapping
     public String listTodos(Model model) {
         List<Todo> todos = todoService.getAllTodos();
+        // 添加调试信息
+        System.out.println("=== 调试待办事项数据 ===");
+        for (Todo todo : todos) {
+            System.out.println("任务: " + todo.getTitle());
+            System.out.println("创建时间: " + todo.getCreatedAt());
+            System.out.println("创建时间是否为null: " + (todo.getCreatedAt() == null));
+            if (todo.getCreatedAt() != null) {
+                System.out.println("格式化时间: " + todo.getCreatedAt().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+            }
+        }
         model.addAttribute("todos", todos);
         model.addAttribute("newTodo", new Todo()); // 用于表单绑定
         return "todo-list";
